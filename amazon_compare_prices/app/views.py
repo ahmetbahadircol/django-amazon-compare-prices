@@ -2,7 +2,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
-from app.tasks import run_feature_one_task
+from app.tasks import amazon_compare_prices
 from app.models import Book
 from services.utils import chunk_list
 from services.amazon.client_amazon import Amazon, create_txt
@@ -14,9 +14,9 @@ def services_page(request):
 
 
 @staff_member_required
-def run_feature_one(request):
+def run_amazon_compare_prices_task(request):
     if request.method == "POST":
-        # Enqueue the Celery task
-        run_feature_one_task.delay()
-        # Respond immediately
+        create_txt()
+        user_email = request.user.email
+        amazon_compare_prices.delay(user_email)
         return JsonResponse({"message": "Feature One has been enqueued successfully!"})

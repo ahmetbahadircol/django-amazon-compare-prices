@@ -1,4 +1,5 @@
 from sp_api.base import Marketplaces
+from sp_api.api import Inventories
 from sp_api.base.exceptions import SellingApiBadRequestException
 from sp_api.api import Products
 from typing import Optional, Tuple
@@ -41,7 +42,7 @@ def create_txt():
 
 
 class Amazon:
-    def __init__(self, asin_list: list):
+    def __init__(self, asin_list: list = None):
         self.books = asin_list
 
     def _format_time(self, t):
@@ -49,6 +50,14 @@ class Amazon:
             datetime.fromtimestamp(t).strftime("%H:%M:%S")
             + f":{int((t % 1) * 1000):03d}"
         )
+
+    @retry_on_throttling(delay=1, max_retries=10)
+    @reauth
+    def get_inventory(**kwargs) -> list[str]:
+        """
+        returns list of asin numbers of books imn inventory
+        """
+        return Inventories().get_inventory_summary_marketplace(**kwargs)
 
     @retry_on_throttling(delay=2, max_retries=7)
     @reauth
