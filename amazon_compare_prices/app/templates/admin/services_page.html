@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Django Admin Function Features</h1>
+<ul>
+    <li>
+        <span>Amazon Compare US and Canada Prices:</span>
+        <button type="button" id="feature-one-button" class="button"
+            onclick="runFeature('/app/feature-one/', 'Feature One has been enqueued successfully!', 'feature-one-button', 'feature-one-message')">
+            Run Feature One
+        </button>
+        <span id="feature-one-message"></span>
+    </li>
+</ul>
+
+<!-- Include CSRF token in a hidden form or meta tag -->
+<form style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script>
+    function runFeature(url, successMessage, buttonId, messageId) {
+        const button = document.getElementById(buttonId);
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        console.log("CSRF Token:", csrfToken); // Debugging CSRF token
+
+        button.disabled = true;
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => {
+                console.log("Response received:", response);
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Network response was not ok");
+                }
+            })
+            .then((data) => {
+                console.log("Data received:", data);
+                document.getElementById(messageId).textContent = data.message || successMessage;
+            })
+            .catch((error) => {
+                console.error("Request failed:", error);
+                button.disabled = false; // Re-enable the button if the request fails
+            });
+    }
+</script>
+{% endblock %}

@@ -16,7 +16,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.shortcuts import redirect
 
 from app import views
@@ -24,5 +24,5 @@ from app import views
 urlpatterns = [
     path("", lambda request: redirect("admin/login/", permanent=True)),
     path("admin/", admin.site.urls),
-    path("custom-page", views.custom_admin_page, name="custom_admin_page"),
+    path("app/", include("app.urls")),
 ]
