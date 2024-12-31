@@ -1,10 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
-from django.http import HttpResponse
 from django.http import JsonResponse
-from app.tasks import amazon_compare_prices
-from app.models import Book
-from services.utils import chunk_list
+from app.tasks import amazon_compare_prices, black_list_restirected_books
 from services.amazon.client_amazon import Amazon, create_txt
 
 
@@ -19,4 +16,17 @@ def run_amazon_compare_prices_task(request):
         create_txt()
         user_email = request.user.email
         amazon_compare_prices.delay(user_email)
-        return JsonResponse({"message": "Feature One has been enqueued successfully!"})
+        return JsonResponse(
+            {"message": "Amazon Compare Prices App has been enqueued successfully!"}
+        )
+
+
+@staff_member_required
+def run_black_list_restirected_books_task(request):
+    if request.method == "POST":
+        black_list_restirected_books.delay()
+        return JsonResponse(
+            {
+                "message": "Black List Restirected Books App has been enqueued successfully!"
+            }
+        )

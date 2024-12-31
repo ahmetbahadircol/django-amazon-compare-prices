@@ -1,7 +1,8 @@
 from celery import shared_task
 from app.models import Book
 from services.utils import chunk_list, send_mail
-from services.amazon.client_amazon import Amazon, create_txt
+from services.amazon.client_amazon import Amazon
+from services.black_list.main_class import BlackList
 
 
 @shared_task
@@ -18,4 +19,9 @@ def amazon_compare_prices(user_email):
             ],
             recipient_emails=[user_email],
         )
-    return "Feature One executed successfully!"
+    return "Feature executed successfully!"
+
+@shared_task
+def black_list_restirected_books():
+    BlackList().run_app()
+    return "Feature executed successfully!"
