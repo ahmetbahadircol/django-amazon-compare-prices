@@ -48,7 +48,6 @@ def reauth(func):
             return func(*args, **kwargs)
         except SellingApiForbiddenException:
             print("Re-Auth is needed. Re-authaticating...")
-            auth()
             return func(*args, **kwargs)
 
     return wrapper

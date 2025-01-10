@@ -51,6 +51,7 @@ class Amazon:
             + f":{int((t % 1) * 1000):03d}"
         )
 
+    @staticmethod
     @retry_on_throttling(delay=1, max_retries=10)
     @reauth
     def get_inventory(**kwargs) -> list[str]:

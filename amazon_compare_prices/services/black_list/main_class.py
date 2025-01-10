@@ -17,7 +17,7 @@ class BlackList:
         co = 0
         try:
             while True:
-                res = Amazon().get_inventory(**data)
+                res = Amazon.get_inventory(**data)
                 temp = res.payload.get("inventorySummaries", [])
 
                 for book in temp:
@@ -43,7 +43,7 @@ class BlackList:
     def read_black_list(self):
         import re
 
-        file_path = "services/black_list/restirected_books/black_asin_list.txt"
+        file_path = "services/black_list/restirected_books/input_black_asin_list.txt"
 
         black_list, res = [], []
 
@@ -67,28 +67,9 @@ class BlackList:
         )
         result_list = self.get_inventory_marketplace(
             Marketplaces.US.marketplace_id, result_list
-        )
+        ).extend(result_list)
 
         set_black = set(black_list)
         set_inventory = set(result_list)
-        common_items = set_black.intersection(set_inventory)
+        return set_black.intersection(set_inventory)
 
-        if common_items:
-
-            with open("restirected_books/inventory_asins.txt", "w") as file:
-                for i in common_items:
-                    file.write(str(i) + "\n")
-
-            send_mail(
-                subject="Black List ASINs",
-                attachments=[
-                    "services/black_list/restirected_books/inventory_asins.txt"
-                ],
-            )
-
-            print("Email sent!")
-
-        else:
-            print("There is no ASINs to send!")
-
-        return common_items

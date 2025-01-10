@@ -21,7 +21,22 @@ def amazon_compare_prices(user_email):
         )
     return "Feature executed successfully!"
 
+
 @shared_task
-def black_list_restirected_books():
-    BlackList().run_app()
+def black_list_restirected_books(user_mail):
+    common_items = BlackList().run_app()
+    with open(
+        "services/black_list/restirected_books/output_inventory_asins.txt", "w"
+    ) as file:
+        for i in common_items:
+            file.write(str(i) + "\n")
+
+    send_mail(
+        subject="Black List ASINs",
+        attachments=[
+            "services/black_list/restirected_books/output_inventory_asins.txt"
+        ],
+    )
+
+    print("Email sent!")
     return "Feature executed successfully!"
