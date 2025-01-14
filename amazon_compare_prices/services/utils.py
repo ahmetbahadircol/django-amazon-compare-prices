@@ -6,6 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 import os
+import json
 
 load_dotenv()
 
@@ -46,6 +47,9 @@ def send_mail(
         except FileNotFoundError as e:
             print(e)
             break
+        except NotADirectoryError as e:
+            print(e)
+            break
         encoders.encode_base64(part)
         part.add_header("Content-Disposition", f"attachment; filename= {filename}")
         message.attach(part)
@@ -58,5 +62,12 @@ def send_mail(
     print("Email is sent!")
 
 
-if __name__ == "__main__":
-    send_mail()
+def chunk_dict(data, chunk_size=20):
+    it = iter(data.items())
+    for _ in range(0, len(data), chunk_size):
+        yield dict(islice(it, chunk_size))
+
+
+def convert_bytes_to_dict(bytes):
+    string_data = bytes.decode("utf-8")
+    return json.loads(string_data)

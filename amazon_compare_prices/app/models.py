@@ -7,10 +7,10 @@ from .enums import BookType, Currencies
 class Book(models.Model):
     asin = models.CharField(db_index=False, max_length=20)
     title = models.CharField(null=True, max_length=200)
-    book_type = models.CharField(choices=BookType.choices(), max_length=10)
+    book_type = models.CharField(choices=BookType.choices(), max_length=10, null=True)
     price = models.FloatField(null=True)
     shipping_price = models.FloatField(null=True)
-    currency = models.CharField(choices=Currencies.choices(), max_length=3)
+    currency = models.CharField(choices=Currencies.choices(), max_length=3, null=True)
 
     def __str__(self):
         return f"{self.asin} - {self.title}"
