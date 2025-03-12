@@ -6,6 +6,7 @@ from app.tasks import (
     amazon_compare_prices,
     black_list_restirected_books,
     gw_book_store_compare_prices,
+    write_asin,
 )
 from services.amazon.client_amazon import Amazon, create_txt
 
@@ -41,11 +42,23 @@ def run_black_list_restirected_books_task(request):
 @staff_member_required
 def run_gw_book_store_compare_prices_task(request):
     if request.method == "POST":
+        print("Views!!!!")
         user_email = request.user.email
         page = int(convert_bytes_to_dict(request.body).get("gwBooksPage"))
-        print(page)
         # gw_book_store_compare_prices.delay(user_email, int(page))
         gw_book_store_compare_prices(user_email, int(page))
         return JsonResponse(
             {"message": "GW Book Store London App has been enqueued successfully!"}
         )
+    else:
+        print("else")
+
+@staff_member_required
+def run_write_asin_task(request):
+    if request.method == "POST":
+        write_asin()
+        return JsonResponse(
+            {"message": "Write Asin App has been enqueued successfully!"}
+        )
+    else:
+        print("else")

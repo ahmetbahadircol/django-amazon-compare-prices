@@ -12,6 +12,8 @@ services:
     depends_on:
       - redis
       - celery_worker
+    stdin_open: true
+    tty: true
 
   redis:
     image: redis:alpine

@@ -1,4 +1,5 @@
 from celery import shared_task
+from services.write_asins.write_asins import WriteAsin
 from services.gw_books_london.gwbook_store_client import (
     GWBookStoreClient,
 )
@@ -46,7 +47,7 @@ def black_list_restirected_books(user_email):
     return "Feature executed successfully!"
 
 
-@shared_task
+# @shared_task
 def gw_book_store_compare_prices(user_email, page: int = None):
     print("Task başladı")
     GWBookStoreClient().run_app(page)
@@ -61,4 +62,11 @@ def gw_book_store_compare_prices(user_email, page: int = None):
     )
 
     print("Email sent!")
+    return "Feature executed successfully!"
+
+
+def write_asin():
+    print("Task başladı")
+    WriteAsin().run_app()
+    print("Task bitti")
     return "Feature executed successfully!"

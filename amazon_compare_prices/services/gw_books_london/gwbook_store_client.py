@@ -31,28 +31,37 @@ GBOOKS_STORE_PROFIT_SHARE = int(os.getenv("GBOOKS_STORE_PROFIT_SHARE"))
 class GWBookStoreClient:
     MAIN_URL = "https://gwbookstore-london.myshopify.com"
 
-    def _request(self, url, hearder=None) -> BeautifulSoup:
-        header = hearder or {
-            "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-            "x-user-agent": "grpc-web-javascript/0.1",
-            "sec-ch-ua-full-version-list": '"Google Chrome";v="131.0.6778.110", "Chromium";v="131.0.6778.110", "Not_A Brand";v="24.0.0.0"',
-        }
-        response = requests.get(url, headers=header)
+    def _request(self, url, headers=None) -> BeautifulSoup:
+        # header = header or {
+        #     "User-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+        #     "x-user-agent": "grpc-web-javascript/0.1",
+        #     "sec-ch-ua-full-version-list": '"Google Chrome";v="131.0.6778.110", "Chromium";v="131.0.6778.110", "Not_A Brand";v="24.0.0.0"',
+        # }
+        response = requests.get(url, headers=headers)
         return BeautifulSoup(response.text, "html.parser")
 
     def search_google(self, query: str, pgn=0) -> str:
         url = f"https://www.google.com/search?q={query.replace(' ', '+')}&start={str(pgn)}"
-        headers = {"User-Agent": "Mozilla/5.0"}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, "html.parser")
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        soup = self._request(url, headers=headers)
+        from googlesearch import search
 
+        for uuu in search(query=query, num=5):
+            print(uuu)
+
+        import ipdb
+
+        ipdb.set_trace()
+        print("breakpoint")
         for result in soup.find_all("a"):
             link = result.get("href")
             if link and "/url?q=" in link:
                 temp = link.split("/url?q=")[1].split("&")[0]
                 if "amazon" in temp:
                     if asin := temp.split("/dp/")[-1]:
-                        return asin.split("&")[0]
+                        return asin.split("&")[0] 
         if pgn == 30:
             return
         self.search_google(query=query, pgn=pgn + 10)
@@ -115,6 +124,7 @@ class GWBookStoreClient:
                         )
 
     def search_pages(self, page: int):
+        print("search pages " + str(page))
         gw_books_info = dict()
         url = f"{GWBookStoreClient.MAIN_URL}/collections/all-items?page={page}"
         soup = self._request(url=url)
